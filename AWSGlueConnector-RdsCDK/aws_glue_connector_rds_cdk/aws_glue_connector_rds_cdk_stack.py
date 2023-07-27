@@ -126,6 +126,8 @@ class AwsGlueConnectorRdsCdkStack(Stack):
 
         )
 
+        
+
         username = "user" + core.Fn.select(2,core.Fn.split('-',core.Fn.select(2,core.Fn.split('/', core.Aws.STACK_ID))))
         
 
@@ -145,7 +147,7 @@ class AwsGlueConnectorRdsCdkStack(Stack):
        
         rds_instance = aws_rds.DatabaseInstance(
             self,
-            "VerticaRDSInstance",
+            "RDSInstance",
             engine = rds_engine,
             instance_type= aws_ec2.InstanceType.of(aws_ec2.InstanceClass.BURSTABLE2,aws_ec2.InstanceSize.MICRO),
             vpc = rds_vpc,
@@ -157,7 +159,10 @@ class AwsGlueConnectorRdsCdkStack(Stack):
             cloudwatch_logs_exports=["error", "general", "slowquery"],
             security_groups=[security_group],
             database_name="MYSQL_Database",
-            credentials=aws_rds.Credentials.from_username(username = username,password=secret_value_password)
+            credentials=aws_rds.Credentials.from_username(username = username,password=secret_value_password),
+            allocated_storage=100,
+            auto_minor_version_upgrade=True,
+            backup_retention=core.Duration.days(0)
            
         )
         
